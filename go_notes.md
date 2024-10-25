@@ -1,3 +1,6 @@
+
+A typed, compiled language, Golang offers immense performance without the usually required expertise. Some features of Go are the vast standard library and excellent concurrency support. However, Go is not a perfect language, and often has strange pitfalls or is not applicable in certain use cases. For example, GUI libraries are some immature, and the language only implemented `Min` and `Max` functions in 1.21 (released September 2023).
+
 ## The benefits and costs of writing a POSIX kernel in a high-level language
 
 Evaluation of a high-level language to implement a POSIX-style kernel
@@ -41,3 +44,4 @@ The GO version was 5% to 15% slower, GC costs up to 3% of CPU, longest pause was
 Other language costs were around 10%
 
 Has enough to be able to compare fairly sophisticated things
+
