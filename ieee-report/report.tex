@@ -25,18 +25,6 @@ However, current unikernel implementations face several challenges that limit th
 
 The Singularity project has demonstrated that using high-level languages for operating system development can improve reliability while maintaining performance \cite{singularity}. Building on this work, recent research has explored writing POSIX kernels in high-level languages \cite{go_kernel}, suggesting potential paths forward for improving unikernel development and reliability.
 
-% \section{Related Work}
-% \subsection{Traditional Virtualization Approaches}
-% Traditional virtualization approaches rely on either full virtual machines or containers. VMs provide strong isolation through hardware virtualization but incur significant overhead in terms of resource usage and boot time. Containers share the host kernel to achieve better efficiency but may compromise on security isolation \cite{linux_kernel_clothing}.
-
-% \subsection{Unikernel Implementations}
-% Current unikernel implementations can be broadly categorized into two approaches:
-
-% \subsubsection{Language-specific Unikernels}
-% Platforms like MirageOS and HalVM are designed around specific programming languages and provide custom APIs. These implementations achieve superior performance and smaller image sizes but require applications to be written specifically for the platform \cite{singularity}.
-
-% \subsubsection{POSIX-compatible Unikernels}
-% Systems like OSv and Rumprun aim to support existing applications through POSIX compatibility. Recent benchmarking studies have shown that while these platforms offer easier adoption paths, they often sacrifice some of the potential performance benefits of unikernels \cite{unikernels_vs_containers}. However, innovative approaches like Lupine demonstrate that it's possible to achieve both POSIX compatibility and good performance by carefully configuring Linux kernel features \cite{linux_kernel_clothing}.
 \section{Related Work}
 The evolution of unikernel architectures has produced several distinct approaches to addressing the challenges of efficient virtualization. Here we analyze the major contributions and their trade-offs across different implementation strategies.
 
@@ -45,6 +33,7 @@ Several projects have taken the approach of building unikernels around specific 
 
 \subsubsection{Clean-Slate Designs}
 Madhavapeddy et al.'s MirageOS represents one of the earliest specialized unikernel designs \cite{linux_kernel_clothing}. By building the entire system in OCaml, MirageOS achieves strong type safety and memory safety guarantees. The key advantages of this approach include:
+
 \begin{itemize}
 	\item Extremely small memory footprint
 	\item Strong safety guarantees from compile-time checks
