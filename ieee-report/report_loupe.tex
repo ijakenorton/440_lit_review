@@ -7,7 +7,7 @@
 
 \begin{document}
 
-\title{SystemBridge: A Systematic Approach to Building OS Compatibility Layers Using Dynamic Analysis}
+\title{KernelBridge: A Systematic Approach to Building OS Compatibility Layers Using Dynamic Analysis}
 
 \author{\IEEEauthorblockN{Jake Norton}
 	\IEEEauthorblockA{Department of Computer Science\\
@@ -17,17 +17,29 @@
 \maketitle
 
 \begin{abstract}
-	Building compatibility layers is crucial for new operating systems, but implementing and maintaining them requires significant engineering effort. This paper presents KernelBridge, a standalone compatibility layer that can be dynamically or statically linked into emerging operating systems. Using insights from dynamic analysis techniques, KernelBridge provides a minimal yet sufficient implementation of the Linux system call interface, with intelligent handling of non-critical calls through stubbing and faking. Our implementation can be integrated at build time for static linking or loaded at runtime through a dynamic linking interface, providing flexibility for different OS architectures. The system demonstrates successful integration with multiple experimental operating systems including [example OSes], showing its practical utility for OS development.
+	Building compatibility layers is crucial for new operating systems, but implementing and
+	maintaining them requires significant engineering effort. This paper presents KernelBridge, a
+	standalone compatibility layer that can be dynamically or statically linked into emerging
+	operating systems. Using insights from dynamic analysis techniques, KernelBridge provides a
+	minimal yet sufficient implementation of the Linux system call interface, with
+	handling of non-critical calls through stubbing and faking. The implementation can be integrated at build time for static linking or loaded at runtime through a dynamic linking interface, providing flexibility for different OS architectures.
 \end{abstract}
 
 \section{Introduction}
-The development of new operating systems, particularly unikernels and specialized OS designs, has seen significant growth in recent years. These systems often aim to provide better security, performance, or resource utilization than traditional operating systems \cite{madhavapeddy2015unikernels}. However, a critical challenge for any new operating system is supporting existing applications, which typically requires implementing compatibility layers for established interfaces like POSIX or the Linux system call API \cite{linux_kernel_clothing}.
+The development of new operating systems, particularly unikernels and specialised OS designs, has
+seen significant growth in recent years. These systems often aim to provide better security,
+performance, or resource utilisation than traditional operating systems \cite{madhavapeddy2015unikernels}. However, a critical challenge for any new operating system is supporting existing applications, which typically requires implementing compatibility layers for established interfaces like POSIX or the Linux system call API \cite{linux_kernel_clothing}.
 
-Traditional virtual machines provide strong isolation but incur substantial overhead, while containers offer improved efficiency but may compromise on security isolation. Unikernels represent an interesting middle ground, combining the security benefits of VMs with the efficiency of containers by specializing the entire software stack for a single application \cite{unikernels_vs_containers}. As shown in Figure~\ref{fig:kernels}, different virtualization approaches provide varying levels of isolation and overhead. Traditional VMs provide full isolation but with significant overhead, while containers share the host kernel for better efficiency. Unikernels represent a middle ground, combining the isolation of VMs with efficient specialized implementations. However, all these approaches face the challenge of implementing and maintaining compatibility layers.
+Traditional virtual machines provide strong isolation but incur substantial overhead, while
+containers offer improved efficiency but may compromise on security isolation. Unikernels represent
+an interesting middle ground, combining the security benefits of VMs with the efficiency of
+containers by specialising the entire software stack for a single application
+\cite{unikernels_vs_containers}. As shown in Figure~\ref{fig:kernels}, different virtualisation approaches provide varying levels of isolation and overhead. Traditional VMs provide full isolation but with significant overhead, while containers share the host kernel for better efficiency. However, all these approaches face the challenge of implementing and maintaining compatibility layers.
 
-Recent research has shown that the effort required to implement compatibility layers may be significantly less than previously thought. The Singularity project demonstrated that using high-level languages and modern software engineering practices can improve reliability while maintaining performance \cite{singularity}. Studies of system call usage patterns indicate that many system calls can be either stubbed or faked while still maintaining application functionality \cite{lefeuvre2024loupe}.
+Research has shown that the effort required to implement compatibility layers may be significantly less than previously thought. The Singularity project demonstrated that using high-level languages and modern software engineering practices can improve reliability while maintaining performance \cite{singularity}. Studies of system call usage patterns indicate that many system calls can be either stubbed or faked while still maintaining application functionality \cite{lefeuvre2024loupe}.
 
-Building on these insights, we present KernelBridge, a standalone compatibility layer that can be dynamically or statically linked into emerging operating systems. Our approach combines:
+Building on these insights, I present KernelBridge, a standalone compatibility layer that can be
+dynamically or statically linked into emerging operating systems. The approach combines:
 \begin{itemize}
 	\item Insights from unikernel research on minimal system requirements
 	\item Dynamic analysis techniques for identifying critical system calls
@@ -67,22 +79,22 @@ Building on these insights, we present KernelBridge, a standalone compatibility 
 		\node[above=0.05 of uni] {\small Unikernel};
 
 	\end{tikzpicture}
-	\caption{Comparison of virtualization approaches}
+	\caption{Comparison of virtualisation approaches}
 	\label{fig:kernels}
 \end{figure}
 
 
 \section{Related Work}
 \subsection{Unikernel Approaches}
-Before presenting our design, we examine existing approaches to OS compatibility and their
+Before presenting the design, I examine existing approaches to OS compatibility and their
 limitations. The evolution of unikernel architectures has produced several distinct approaches to OS design and application support.
 
-\subsubsection{Specialized Language-Based Unikernels}
-Projects like MirageOS have demonstrated the benefits of language-specialized unikernels \cite{linux_kernel_clothing}. Key advantages include:
+\subsubsection{Specialised Language-Based Unikernels}
+Projects like MirageOS have demonstrated the benefits of language-specialised unikernels \cite{linux_kernel_clothing}. Key advantages include:
 \begin{itemize}
 	\item Extremely small memory footprint
 	\item Strong safety guarantees from compile-time checks
-	\item Highly optimized performance for supported languages
+	\item Highly optimised performance for supported languages
 \end{itemize}
 
 However, these systems typically require complete application rewrites and lack broad compatibility.
@@ -92,7 +104,7 @@ Systems like Lupine Linux \cite{linux_kernel_clothing} and OSv have taken a diff
 \begin{itemize}
 	\item Efficient system call handling through direct processing
 	\item Support for existing applications with minimal modifications
-	\item Kernel specialization techniques
+	\item Kernel specialisation techniques
 \end{itemize}
 
 Recent benchmarking studies \cite{unikernels_vs_containers} have shown both the potential and limitations of these approaches:
@@ -103,7 +115,7 @@ Recent benchmarking studies \cite{unikernels_vs_containers} have shown both the 
 \end{itemize}
 
 \subsection{High-Level Language Operating Systems}
-Work has explored building entire operating systems in high-level languages, providing valuable insights for compatibility layer design.
+There has been work exploring building entire operating systems in high-level languages, providing valuable insights for compatibility layer design.
 
 \subsubsection{Singularity's Contributions}
 The Singularity project \cite{singularity} demonstrated several key concepts:
@@ -122,7 +134,7 @@ Biscuit \cite{go_kernel} showed that high-level languages can be used effectivel
 \end{itemize}
 
 \subsection{Dynamic Analysis for Compatibility}
-Recent work by Lefeuvre et al. \cite{lefeuvre2024loupe} has revolutionized our understanding of system call requirements through dynamic analysis. Their Loupe system demonstrated:
+Recent work by Lefeuvre et al. \cite{lefeuvre2024loupe} has revolutionised the understanding of system call requirements through dynamic analysis. Their Loupe system demonstrated:
 \begin{itemize}
 	\item Many system calls can be safely stubbed or faked
 	\item Static analysis often significantly overestimates requirements
@@ -145,7 +157,7 @@ More recent approaches, particularly in unikernels, have shown that smaller impl
 \begin{itemize}
 	\item Focus on commonly used system calls
 	\item Eliminate unused functionality
-	\item Optimize for specific use cases
+	\item Optimise for specific use cases
 \end{itemize}
 
 \subsection{Research Gaps}
@@ -153,49 +165,75 @@ Analysis of existing work reveals several opportunities:
 \begin{itemize}
 	\item Need for reusable compatibility implementations
 	\item Lack of systematic approaches to compatibility layer development
-	\item Opportunity for dynamic analysis-driven optimization
+	\item Opportunity for dynamic analysis-driven optimisation
 	\item Need for flexible integration options for different OS designs
 \end{itemize}
 
-These gaps directly motivate our work on KernelBridge, which aims to provide a reusable, efficient, and flexible solution for OS compatibility layers.
-\subsection{Dynamic Analysis for System Call Usage}
-Loupe \cite{lefeuvre2024loupe} introduced a breakthrough in understanding system call usage patterns through dynamic analysis. Their work demonstrated that:
-\begin{itemize}
-	\item Many system calls can be safely stubbed or faked
-	\item Static analysis often significantly overestimates required functionality
-	\item Application behavior can be maintained with minimal system call implementations
-\end{itemize}
+These gaps directly motivate the work on KernelBridge, which aims to provide a reusable, efficient, and flexible solution for OS compatibility layers.
 
 \section{Design Philosophy and Feasibility}
 
-KernelBridge's design stems from the observation that traditional compatibility layer implementations often include unnecessary functionality while requiring significant engineering effort. Building on insights from Loupe \cite{lefeuvre2024loupe}, our approach focuses on providing a minimal yet sufficient implementation that can be easily integrated into new operating systems.
+KernelBridge's design stems from the observation that traditional compatibility layer
+implementations often include unnecessary functionality while requiring significant engineering
+effort. Building on insights from Loupe \cite{lefeuvre2024loupe}, this approach focuses on providing a minimal yet sufficient implementation that can be easily integrated into new operating systems.
+
+\subsection{Building on Dynamic Analysis}
+
+Loupe demonstrated that dynamic analysis can identify which system calls are truly necessary for
+application functionality, and which can be safely stubbed or faked. KernelBridge extends this
+insight in several key ways. First, while Loupe focuses on analysis, KernelBridge provides a
+concrete implementation framework that directly incorporates these findings into its tiered system
+call implementation strategy. Second, the analysis is extended to consider the specific needs of language-specific operating systems, where certain system calls may need different handling due to runtime requirements.
+
+The new analysis framework builds on Loupe's methodology by:
+\begin{itemize}
+	\item Incorporating runtime-specific requirements into the analysis
+	\item Extending system call categorisation to consider FFI overhead
+	\item Adding continuous verification of stub/fake decisions
+	\item Providing feedback mechanisms for performance impact
+\end{itemize}
+
+For example, when analysing system calls for an OCaml-based operating system, the framework considers not just the application's direct system calls, but also those required by the OCaml runtime system. This holistic analysis ensures that system calls critical to garbage collection or thread management are properly implemented rather than stubbed, even if they appear non-critical from the application's perspective.
+
+The analysis will be enhanced by continuously monitoring the impact of stubbing or faking decisions on both functionality and performance. This monitoring allows us to detect cases where a stubbed system call, while not breaking functionality, might create unexpected performance bottlenecks due to error handling paths or retry mechanisms in the application.
 
 \subsection{Design Goals and Novel Contributions}
-The primary innovation of KernelBridge lies in its tiered implementation strategy. Unlike traditional compatibility layers that implement all system calls uniformly, we categorize system calls based on their criticality and usage patterns. This categorization, combined with Loupe-style dynamic analysis, allows us to optimize implementation effort where it matters most.
+The primary innovation of KernelBridge lies in its tiered implementation strategy. Unlike
+traditional compatibility layers that implement all system calls uniformly, the system is
+categorises system calls based on their criticality and usage patterns. This categorisation,
+combined with Loupe-style dynamic analysis, allows us to optimise implementation effort where it matters most.
 
-Our flexible integration model supports both static and dynamic linking, enabling OS developers to choose the most appropriate integration method for their needs. Static linking provides minimal overhead and compile-time optimizations, while dynamic linking offers runtime flexibility and easier updates. The addition of FFI support extends this flexibility to high-level language systems, as demonstrated by our OCaml integration example.
+The flexible integration model supports both static and dynamic linking, enabling OS developers to
+choose the most appropriate integration method for their needs. Static linking provides minimal
+overhead and compile-time optimisations, while dynamic linking offers runtime flexibility and easier
+updates. The addition of FFI support extends this flexibility to high-level language systems, as
+demonstrated by the OCaml integration example.
 
 \subsection{Enabling Fair Performance Comparisons}
-One significant advantage of KernelBridge is its ability to enable direct comparisons between language-specific kernels and traditional operating systems. However, this presents a nuanced challenge in evaluation methodology. While KernelBridge allows identical binaries like Redis or NGINX to run across different systems, care must be taken to distinguish between the performance characteristics of the compatibility layer itself and those of the underlying specialized kernel.
+One significant advantage of KernelBridge is its ability to enable direct comparisons between language-specific kernels and traditional operating systems. However, this presents a nuanced challenge in evaluation methodology. While KernelBridge allows identical binaries like Redis or NGINX to run across different systems, care must be taken to distinguish between the performance characteristics of the compatibility layer itself and those of the underlying specialised kernel.
 
-Previous comparisons between specialized operating systems and mainstream ones have been complicated by differences in application support and measurement methodologies. For example, evaluating a Mirage OS unikernel against Linux traditionally requires comparing different implementations of the same application, such as a TCP/IP stack written in OCaml versus one written in C. While KernelBridge helps standardize application-level comparisons through binary compatibility, researchers must carefully instrument both the compatibility layer and the underlying specialized kernel to understand where performance bottlenecks truly lie.
+Previous comparisons between specialised operating systems and mainstream ones have been complicated by differences in application support and measurement methodologies. For example, evaluating a Mirage OS unikernel against Linux traditionally requires comparing different implementations of the same application, such as a TCP/IP stack written in OCaml versus one written in C. While KernelBridge helps standardise application-level comparisons through binary compatibility, researchers must carefully instrument both the compatibility layer and the underlying specialised kernel to understand where performance bottlenecks truly lie.
 
-The evaluation methodology must consider several layers: the application binary running through KernelBridge, the KernelBridge compatibility layer itself, and the underlying language-specific kernel implementation. This multi-layer analysis presents unique challenges, particularly in high-level language kernels where traditional performance analysis tools may not be directly applicable. For instance, profiling OCaml or Haskell kernel code requires specialized tooling that can understand garbage collection patterns and functional programming constructs, while simultaneously measuring system call overhead and hardware utilization.
+The evaluation methodology must consider several layers: the application binary running through KernelBridge, the KernelBridge compatibility layer itself, and the underlying language-specific kernel implementation. This multi-layer analysis presents unique challenges, particularly in high-level language kernels where traditional performance analysis tools may not be directly applicable. For instance, profiling OCaml or Haskell kernel code requires specialised tooling that can understand garbage collection patterns and functional programming constructs, while simultaneously measuring system call overhead and hardware utilisation.
 
-Despite these challenges, KernelBridge provides a foundation for more systematic OS evaluation by enabling the use of standard benchmarking tools and workloads. This standardization is particularly valuable for the research community, as it establishes a common framework for evaluating new operating system designs against established baselines using real-world applications, while acknowledging and accounting for the complexity of multi-layer performance analysis.
+Despite these challenges, KernelBridge provides a foundation for more systematic OS evaluation by enabling the use of standard benchmarking tools and workloads. This standardisation is particularly valuable for the research community, as it establishes a common framework for evaluating new operating system designs against established baselines using real-world applications, while acknowledging and accounting for the complexity of multi-layer performance analysis.
 
 \subsection{Implementation Challenges}
-Several technical challenges require careful consideration in our implementation. Thread safety in FFI bindings presents a particular challenge, which we address through thread-local storage for FFI state. System call argument validation must balance security with performance, leading to our implementation of compile-time validation where possible and efficient runtime checks where necessary.
+Several technical challenges require careful consideration in the implementation. Thread safety in
+FFI bindings presents a particular challenge, which is addressed through thread-local storage for FFI
+state. System call argument validation must balance security with performance, leading to the implementation of compile-time validation where possible and efficient runtime checks where necessary.
 
-Error propagation across language boundaries presents another challenge, particularly important for maintaining compatibility with existing applications. We implement a standardized error mapping system that preserves error semantics across different integration methods while maintaining reasonable performance characteristics.
+Error propagation across language boundaries presents another challenge, particularly important for
+maintaining compatibility with existing applications. This could be solved by a standardised error mapping system that preserves error semantics across different integration methods while maintaining reasonable performance characteristics.
 
-\subsection{Development Impact and Future Extensions}
-KernelBridge significantly impacts OS development by reducing the time required to achieve initial application compatibility. Our implementation plan prioritizes core functionality, with the base system call handler and critical calls implemented in the first phase, followed by language bindings and additional system calls.
-
-Future extensions will focus on expanding language support, enhancing system call analysis capabilities, and developing automated configuration generation tools. We also plan to develop performance profiling tools specifically designed for analyzing compatibility layer overhead.
+\subsection{Development Impact}
+KernelBridge significantly impacts OS development by reducing the time required to achieve initial
+application compatibility. The implementation plan prioritises core functionality, with the base system call handler and critical calls implemented in the first phase, followed by language bindings and additional system calls.
 
 \subsection{Performance Considerations}
-Performance analysis shows varying trade-offs between integration methods. Static linking provides the best performance with minimal overhead but requires compile-time integration. Dynamic linking introduces a small performance penalty but offers greater flexibility. FFI integration, while the most flexible, incurs the highest overhead but remains within acceptable limits for most applications.
+
+I would expect performance analysis to show varying trade-offs between integration methods. Static
+linking likely provides the best performance with minimal overhead but requires compile-time integration. Dynamic linking introduces a small performance penalty but offers greater flexibility. FFI integration, while the most flexible, incurs the highest overhead but remains within acceptable limits for most applications.
 
 \section{KernelBridge Architecture}
 
@@ -243,12 +281,12 @@ KernelBridge is designed as a modular compatibility layer that can be integrated
 
 \subsection{Core Components}
 \subsubsection{System Call Interface}
-The system call interface provides a minimal yet sufficient implementation of Linux-compatible system calls, determined through dynamic analysis using Loupe-inspired techniques. Key features include:
+The system call interface provides a minimal implementation of Linux-compatible system calls, determined through dynamic analysis using Loupe-inspired techniques. Key features include:
 \begin{itemize}
 	\item Minimal set of fully implemented critical system calls
 	\item Intelligent stubbing and faking for non-critical calls
-	\item Configurable behavior for different OS requirements
-	\item Extensible interface for OS-specific optimizations
+	\item Configurable behaviour for different OS requirements
+	\item Extensible interface for OS-specific optimisations
 \end{itemize}
 
 \subsubsection{OS Adaptation Layer}
@@ -256,7 +294,7 @@ This layer handles the translation between KernelBridge's abstract interface and
 \begin{itemize}
 	\item Abstract resource management interfaces
 	\item Memory mapping abstractions
-	\item Threading and synchronization primitives
+	\item Threading and synchronisation primitives
 	\item I/O subsystem adaptations
 \end{itemize}
 
@@ -268,7 +306,7 @@ For static linking, KernelBridge provides:
 \begin{itemize}
 	\item Build-time configuration options
 	\item Dead code elimination for unused features
-	\item Compile-time optimizations
+	\item Compile-time optimisations
 	\item Direct system call table integration
 \end{itemize}
 
@@ -282,14 +320,16 @@ For dynamic linking, KernelBridge implements:
 
 \section{Implementation}
 \subsection{Core Library Implementation}
-The core KernelBridge library is implemented in C with assembly where necessary for performance:
+The core KernelBridge library is will be implemented in C with assembly where necessary for
+performance, some example code:
 
 \begin{verbatim}
 struct kb_ops {
     /* OS-specific operations */
     void* (*alloc)(size_t size);
     void  (*free)(void *ptr);
-    int   (*map_memory)(void *addr, size_t len);
+    int   (*map_memory)(void *addr, 
+						size_t len);
     /* ... other operations ... */
 };
 
@@ -332,7 +372,7 @@ Fully implemented system calls essential for basic operation:
 \end{itemize}
 
 \subsubsection{Tier 2: Commonly Used Calls}
-Partially implemented calls with common case optimization:
+Partially implemented calls with common case optimisation:
 \begin{itemize}
 	\item Network operations
 	\item Extended file operations
@@ -345,7 +385,7 @@ Stubbed or faked calls determined by dynamic analysis:
 \begin{itemize}
 	\item Rarely used features
 	\item Non-critical system information queries
-	\item Optional performance optimizations
+	\item Optional performance optimisations
 	\item Legacy compatibility calls
 \end{itemize}
 
@@ -392,7 +432,7 @@ let write fd buf len =
 \end{verbatim}
 
 The C side remains mostly unchanged but needs
-to initialize the OCaml runtime:
+to initialise the OCaml runtime:
 
 \begin{verbatim}
 int main(void) {
@@ -431,11 +471,30 @@ This integration demonstrates:
 	\item Minimal overhead for basic operations
 \end{itemize}
 
+\subsection{Analysis of Language Integration}
+The OCaml integration example demonstrates several key aspects of KernelBridge's design philosophy.
+First, it shows how high-level language features could be safely bridged to low-level system calls without sacrificing type safety or memory safety. The use of OCaml's ctypes library provides strong guarantees about the correctness of FFI bindings, reducing the risk of memory corruption or type errors that often plague traditional FFI implementations.
+
+This integration is particularly significant for language-specific operating systems. Traditional approaches would require either reimplementing system calls in the native language (as MirageOS does with OCaml) or creating unsafe bindings to C implementations. KernelBridge offers a middle ground, allowing these systems to:
+\begin{itemize}
+	\item Maintain type safety through the FFI layer
+	\item Reuse existing system call implementations
+	\item Preserve garbage collection semantics
+	\item Avoid common FFI pitfalls
+\end{itemize}
+
+However, this approach also reveals certain challenges. The overhead of crossing language boundaries, while minimal for basic operations, could become significant for system calls that are frequently invoked. Additionally, error handling across language boundaries requires careful consideration to ensure that error semantics are preserved and that resources are properly managed in both languages.
+
+These observations have influenced the tiered implementation strategy. System calls that are frequently invoked might need to be moved from Tier 2 to Tier 1 when used in a language-specific context, even if they would normally be candidates for partial implementation. This dynamic demonstrates how KernelBridge's design flexibly adapts to different usage patterns while maintaining its core philosophy of minimal yet sufficient implementation.
+
 \section{Discussion}
-Our work on KernelBridge reveals several important considerations for compatibility layer development and OS research. The ability to support both traditional and language-specific operating systems through a single compatibility layer presents both opportunities and challenges.
+The work on KernelBridge reveals several important considerations for compatibility layer development and OS research.
 
 \subsection{Limitations}
-While KernelBridge provides a flexible solution for OS compatibility, several limitations should be acknowledged. First, the performance overhead of the FFI layer, while acceptable for many applications, may be problematic for highly performance-sensitive systems. Second, our tiered approach to system call implementation requires careful consideration of which calls can be safely stubbed or faked, as incorrect decisions could lead to subtle application bugs.
+
+While KernelBridge provides a flexible solution for OS compatibility, several limitations should be
+acknowledged. First, the performance overhead of the FFI layer, while acceptable for many
+applications, may be problematic for highly performance-sensitive systems. Second, the tiered approach to system call implementation requires careful consideration of which calls can be safely stubbed or faked, as incorrect decisions could lead to subtle application bugs.
 
 \subsection{Security Implications}
 The introduction of a compatibility layer raises important security considerations. While KernelBridge can help isolate potentially dangerous system calls through its tiered implementation strategy, it also increases the attack surface of the operating system. The balance between compatibility and security must be carefully managed, particularly in security-focused operating systems.
@@ -450,11 +509,14 @@ Several promising research directions emerge from this work:
 \end{itemize}
 
 \section{Conclusion}
-We have presented KernelBridge, a flexible compatibility layer that enables both traditional and language-specific operating systems to support existing Linux applications. Through its tiered implementation strategy and support for multiple integration methods, KernelBridge significantly reduces the engineering effort required to implement OS compatibility layers while maintaining acceptable performance characteristics.
+I have presented KernelBridge, a flexible compatibility layer that enables both traditional and
+language-specific operating systems to support existing Linux applications. Through its tiered
+implementation strategy and support for multiple integration methods, KernelBridge could significantly reduce the engineering effort required to implement OS compatibility layers while maintaining acceptable performance characteristics.
 
-Our approach demonstrates that it is possible to bridge the gap between specialized operating systems and mainstream applications without sacrificing the benefits of either. The ability to run identical binaries across different OS implementations enables fair comparisons and evaluations, contributing to the advancement of OS research.
+The approach demonstrates that it is possible to bridge the gap between specialised operating systems and mainstream applications without sacrificing the benefits of either. The ability to run identical binaries across different OS implementations enables fair comparisons and evaluations, contributing to the advancement of OS research.
 
-The design and implementation of KernelBridge provide a foundation for future work in OS compatibility layers and suggest new directions for research in operating system design. As the field continues to evolve with new language-specific and specialized operating systems, the need for flexible compatibility solutions will only grow more important.
+The design and implementation of KernelBridge provide a foundation for future work in OS compatibility layers and suggest new directions for research in operating system design. As the field continues to evolve with new language-specific and specialised operating systems, the need for flexible compatibility solutions will only grow more important.
+
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
 
